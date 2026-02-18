@@ -1,9 +1,7 @@
-#importar las librerias necesarias
 import os
 from dataclasses import dataclass
 from redis import Redis
 from dotenv import load_dotenv
-
 
 # Cargar variables de entorno (.env o Secrets de GitHub)
 load_dotenv()
@@ -21,7 +19,7 @@ def obtener_configuracion() -> ConfiguracionRedis:
     Retorna una instancia inmutable de ConfiguracionRedis con la URL.
     Usa REDIS_URL o el valor por defecto redis://localhost:6379/0.
     """
-    url = os.getenv("REDIS_URL", "redis://default:*******@redis-11308.c257.us-east-1-3.ec2.cloud.redislabs.com:11308")
+    url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
     return ConfiguracionRedis(url=url)
 
 
@@ -39,4 +37,3 @@ def obtener_conexion() -> Redis:
     conexion.ping()
 
     return conexion
-
