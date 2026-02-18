@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
+      # Servicio Redis
       redis:
         image: redis:7
         ports:
@@ -43,15 +44,22 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
-    - name: Test with pytest
-      env:
-        PYTHONPATH: ${{ github.workspace }}
-        REDIS_URL: redis://localhost:6379/0
+    - name: Instalar redis-cli (redis-tools)
       run: |
-        # Espera a que Redis esté listo
+        sudo apt-get update
+        sudo apt-get install -y redis-tools
+
+    - name: Esperar a que Redis esté listo
+      run: |
         for i in {1..15}; do
           redis-cli -h localhost ping && break
           sleep 2
         done
         redis-cli -h localhost ping
+
+    - name: Test with pytest
+      env:
+        PYTHONPATH: ${{ github.workspace }}
+        REDIS_URL: ${{ secrets.REDIS_URL }}
+      run: |
         pytest -v
