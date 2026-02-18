@@ -21,7 +21,7 @@ def obtener_configuracion() -> ConfiguracionRedis:
     Retorna una instancia inmutable de ConfiguracionRedis con la URL.
     Usa REDIS_URL o el valor por defecto redis://localhost:6379/0.
     """
-    url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+    url = os.getenv("REDIS_URL", "redis://default:*******@redis-11308.c257.us-east-1-3.ec2.cloud.redislabs.com:11308")
     return ConfiguracionRedis(url=url)
 
 
