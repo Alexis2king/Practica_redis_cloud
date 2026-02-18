@@ -12,6 +12,16 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping" 
+          --health-interval 10s 
+          --health-timeout 5s 
+          --health-retries 5
 
     steps:
     - uses: actions/checkout@v4
@@ -24,7 +34,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest redis
+        pip install flake8 pytest redis python-dotenv
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
     - name: Lint with flake8
@@ -32,20 +42,9 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
-    - name: Instalar redis-cli (redis-tools)
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y redis-tools
-
-    - name: Debug REDIS_URL
-      run: |
-        echo "REDIS_URL is $REDIS_URL"
-      env:
-        REDIS_URL: ${{ secrets.REDIS_URL }}
-
     - name: Test with pytest
       env:
         PYTHONPATH: ${{ github.workspace }}
-        REDIS_URL: ${{ secrets.REDIS_URL }}
+        REDIS_URL: "redis://localhost:6379/0"  #  Aquí apuntamos al servicio Redis local
       run: |
         pytest -v
